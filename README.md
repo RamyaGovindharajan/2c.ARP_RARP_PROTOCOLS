@@ -1,144 +1,62 @@
-# 2c.SIMULATING ARP /RARP PROTOCOLS
-##  NAME : Ramya G
+# 3a.CREATION FOR ECHO CLIENT AND ECHO SERVER USING TCP SOCKETS
+## NAME : Ramya G
 ## REGISTER NUMBER : 212224220078
-## AIM
-To write a python program for simulating ARP protocols using TCP.
+# AIM
+To write a python program for creating Echo Client and Echo Server using TCP
+Sockets Links.
 ## ALGORITHM:
-## Client:
-1. Start the program
-2. Using socket connection is established between client and server.
-3. Get the IP address to be converted into MAC address.
-4. Send this IP address to server.
-5. Server returns the MAC address to client.
-## Server:
-1. Start the program
-2. Accept the socket which is created by the client.
-3. Server maintains the table in which IP and corresponding MAC addresses are
-stored.
-4. Read the IP address which is send by the client.
-5. Map the IP address with its MAC address and return the MAC address to client.
-P
-## PROGRAM - ARP
+1. Import the necessary modules in python
+2. Create a socket connection to using the socket module.
+3. Send message to the client and receive the message from the client using the Socket module in
+ server .
+4. Send and receive the message using the send function in socket.
+## PROGRAM
 ### server:
 ```python
 import socket
-s = socket.socket()
-s.bind(('localhost', 8000))
-s.listen(5)
-print("Server is listening...")
 
-c, addr = s.accept()
-print(f"Connection established with {addr}")
+HOST = '127.0.0.1'  
+PORT = 65432        
 
-address = {
-    "165.165.80.80": "6A:08:AA:C2",
-    "165.165.79.1": "8A:BC:E3:FA"
-}
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
 
-while True:
-    ip = c.recv(1024).decode()
-
-    if not ip:  
-        break
-
-    try:
-        mac = address[ip]  # Get the MAC address for the IP
-        print(f"IP: {ip} -> MAC: {mac}")
-        c.send(mac.encode())  
-    except KeyError:
-        print(f"IP: {ip} not found in ARP table.")
-        c.send("Not Found".encode())
-c.close()
-s.close()
+    print(f"Server is listening on {HOST}:{PORT}")
+    while True:
+        conn, addr = server_socket.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+                print(f"Echoed: {data.decode('utf-8')}")
 ```
-### client
+### client:
 ```python
+
 import socket
-c = socket.socket()
-c.connect(('localhost', 8000))
 
-while True:
-    ip = input("Enter IP address to find MAC (or type 'exit' to quit): ")
+HOST = '127.0.0.1'  
+PORT = 65432  
 
-    if ip.lower() == "exit":  
-        break
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+    client_socket.connect((HOST, PORT))
 
-    c.send(ip.encode())
-    mac = c.recv(1024).decode()
-    print(f"MAC Address for {ip}: {mac}")
-c.close()
+    message = 'Hello, Server!'
+    client_socket.sendall(message.encode('utf-8'))
 
+    data = client_socket.recv(1024)
+    print(f"Received echo: {data.decode('utf-8')}")
 ```
-
-## OUTPUT - ARP
+## OUTPUT:
 ### server:
-
-
 ![alt text](image.png)
-### client
 
+### client:
 ![alt text](image-1.png)
-
-
-## PROGRAM - RARP
-### server
-```python
-import socket
-s = socket.socket()
-s.bind(('localhost', 8000))
-s.listen(5)
-print("Server is listening for RARP requests...")
-c, addr = s.accept()
-print(f"Connection established with {addr}")
-
-rarp_table = {
-    "6A:08:AA:C2": "165.165.80.80",
-    "8A:BC:E3:FA": "165.165.79.1"
-}
-
-while True:
-    mac = c.recv(1024).decode()
-
-    if not mac:  
-        break
-
-    try:
-        ip = rarp_table[mac]  
-        print(f"MAC: {mac} -> IP: {ip}")
-        c.send(ip.encode())  
-    except KeyError:
-        print(f"MAC: {mac} not found in RARP table.")
-        c.send("Not Found".encode())
-c.close()
-s.close()
-
-```
-
-### client
-```python
-import socket
-c = socket.socket()
-c.connect(('localhost', 8000))
-
-while True:
-    mac = input("Enter MAC address to find IP (or type 'exit' to quit): ")
-    if mac.lower() == "exit":  
-        break
-    c.send(mac.encode())
-    ip = c.recv(1024).decode()
-    print(f"IP Address for {mac}: {ip}")
-c.close()
-
-
-```
-
-## OUTPUT -RARP
-
-### server
-![alt text](image-3.png)
-### client
-
-![alt text](image-2.png)
 ## RESULT
-Thus, the python program for simulating ARP protocols using TCP was successfully 
-executed.
+Thus, the python program for creating Echo Client and Echo Server using TCP Sockets Links 
+was successfully created and executed.
